@@ -30,12 +30,17 @@ function getCities(event) {
 
     const url = `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${ufValue}/municipios`
     
+    
+    citySelect.innerHTML = "<option value>Selecione a cidade</option>"
+    citySelect.disabled = true
+
+
     fetch(url)
     .then( res => res.json() )
     .then( cities => {
 
         for( const city of cities ) {
-            citySelect.innerHTML += `<option value="${city.id}">${city.nome}</option>`
+            citySelect.innerHTML += `<option value="${city.nome}">${city.nome}</option>`
         }
         
         citySelect.disabled = false
@@ -46,3 +51,53 @@ function getCities(event) {
 document
     .querySelector("select[name=uf]")
     .addEventListener("change", getCities)
+
+
+// itens de coleta 
+//pega todos os li's
+const intensToCollect = document.querySelectorAll(".itens-grid li")
+
+for (const iten of intensToCollect) {
+    iten.addEventListener("click" , handleSelectedItens)
+}
+
+const collectedItens = document.querySelector("input[name=items]")
+
+let selectItems = []
+
+function handleSelectedItens(event) {
+    const itemLi = event.target
+    
+    //adicionar ou remover uma classe
+    itemLi.classList.toggle("selected")
+    
+    const itemId = itemLi.dataset.id
+
+    // Vou verificar se a itens selecionados
+    // se sim pega os intens selecionados
+    
+    const alreadySelected = selectItems.findIndex( item => {
+        const itemFound  = item == itemId //isso sera true ou false
+        return itemFound
+    })
+
+    // se ja estiver selecionado 
+    if(alreadySelected >= 0) {
+        // tira da selecao
+        const filteredItems = selectItems.filter( item => {
+            const itemIsDifferent = item != itemId 
+            return itemIsDifferent 
+        } )
+
+        selectItems = filteredItems
+    } else {
+        // se nao estiver selecionado, 
+        // adiciona a selecao
+        selectItems.push(itemId)
+    }
+    
+    //atualizaro campo escondido
+    
+    collectedItens.value = selectItems
+
+}
